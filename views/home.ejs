@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitTrack</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <style>
+    /* Set background image with overlay */
+    body {
+      background-image: url("../images/pexels-823sl-2294361.jpg");
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Overlay on background to improve text readability */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4); /* Dark overlay */
+      z-index: -1;
+    }
+
+    /* Remove scrollbar and prevent overflow */
+    html,
+    body {
+      height: 100%;
+    }
+
+    .full-height {
+      height: 100vh;
+    }
+
+    /* Navbar styles with gradient and sticky positioning */
+    nav.navbar {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
+      padding: 15px 0;
+      z-index: 1000;
+    }
+
+    nav.navbar .navbar-brand {
+      font-size: 2rem;
+      font-weight: bold;
+      color: white !important;
+      letter-spacing: 1px;
+    }
+
+    nav.navbar .navbar-nav .nav-link {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      padding: 10px 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.3s ease;
+    }
+
+    nav.navbar .navbar-nav .nav-link:hover,
+    nav.navbar .navbar-nav .nav-link:focus {
+      color: #007bff !important;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+    }
+
+    /* Center the content with better spacing and padding */
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      padding: 50px;
+    }
+
+    /* Adjusting text styles */
+    .display-4 {
+      font-size: 4rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .display-5 {
+      font-size: 2.5rem;
+      font-style: italic;
+      margin-bottom: 30px;
+    }
+
+    .lead {
+      font-size: 1.5rem;
+      font-weight: 500;
+      font-style: italic;
+      margin-bottom: 30px;
+    }
+
+    /* Fade-in animation */
+    .fade-in {
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    /* Keyframes for fade-in animation */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* Custom Button Styling */
+    .btn-custom {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 25px;
+      border: 2px solid #007bff;
+      background-color: transparent;
+      color: #007bff;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+      background-color: #007bff;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* Container for button */
+    .btn-container {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+
+  <!-- Overlay -->
+  <div class="overlay"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">FitTrack</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/aboutus">About Us</a></li>
+          <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content (Centered Section) -->
+  <main class="full-height fade-in">
+    <div class="container text-center">
+      <h1 class="display-4 font-weight-bold font-italic">Welcome to <span class="font-italic">FitTrack</span></h1>
+      <p class="lead">Your personal weight loss management assistant</p>
+
+      <section class="py-5">
+        <h2 class="display-5 fade-in">"Track Your Progress. Achieve Your Goals."</h2>
+        <div class="btn-container">
+          <a href="/register" class="btn btn-custom btn-lg mt-4 fade-in">Get Started</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

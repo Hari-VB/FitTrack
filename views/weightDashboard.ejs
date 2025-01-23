@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weight Loss Tracker</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    /* Set background image with overlay */
+    body {
+      background-image: url("../images/pexels-823sl-2294361.jpg");
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Overlay on background to improve text readability */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      /* Dark overlay */
+      z-index: -1;
+    }
+
+    /* Remove scrollbar and prevent overflow */
+    html,
+    body {
+      height: 100%;
+    }
+
+    .full-height {
+      height: 100vh;
+    }
+
+    /* Navbar styles with gradient and sticky positioning */
+    nav.navbar {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2));
+      padding: 15px 0;
+      z-index: 1000;
+    }
+
+    nav.navbar .navbar-brand {
+      font-size: 2rem;
+      font-weight: bold;
+      color: white !important;
+      letter-spacing: 1px;
+    }
+
+    nav.navbar .navbar-nav .nav-link {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      padding: 10px 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.3s ease;
+    }
+
+    nav.navbar .navbar-nav .nav-link:hover,
+    nav.navbar .navbar-nav .nav-link:focus {
+      color: #007bff !important;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+    }
+
+    h1 {
+      font-weight: bold;
+      color: rgb(255, 255, 255);
+      font-style: italic;
+    }
+  </style>
+</head>
+
+
+<body class="bg-light">
+
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">FitTrack</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+
+          <li class="nav-item">
+            <form action="/logout" method="post" class="form-inline">
+              <button type="submit" class="btn btn-secondary" id="logout-btn">Logout</button>
+            </form>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container my-5">
+
+    <h1 class="text-center  mb-4">Track Your Weight Loss Journey</h1>
+
+    <!-- Grid Layout for Cards -->
+    <div class="row">
+      <!-- Weight Add Form Card -->
+      <div class="col-md-4 mb-4">
+        <div class="card p-4 shadow h-100">
+          <h4 class="card-title text-center">Add Your Weight</h4>
+          <form action="/addWeight" method="POST">
+            <div class="form-group">
+              <label for="weight">Weight (kg):</label>
+              <input type="number" id="weight" name="weight" required class="form-control"
+                placeholder="Enter your weight">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Add Weight</button>
+            <span id="add-weight-error" class="text-danger d-block mt-2"></span>
+          </form>
+        </div>
+      </div>
+
+      <!-- Weight History Card -->
+      <div class="col-md-4 mb-4">
+        <div class="card p-4 shadow h-100">
+          <h4 class="card-title text-center">Your Weight History</h4>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Weight (kg)</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="weight-list-items"></tbody>
+          </table>
+          <div class="d-flex justify-content-between align-items-center mt-4">
+            <button id="prev-page" class="btn btn-secondary" disabled>Previous</button>
+            <span id="current-page" class="h5">Page 1</span>
+            <button id="next-page" class="btn btn-secondary">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weight Difference Card -->
+      <div class="col-md-4 mb-4">
+        <div class="card p-4 shadow h-100">
+          <h4 class="card-title text-center">Calculate Weight Difference</h4>
+          <form id="difference-form">
+            <div class="form-group">
+              <label for="startDate">Start Date:</label>
+              <input type="date" id="startDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="endDate">End Date:</label>
+              <input type="date" id="endDate" class="form-control" required>
+            </div>
+            <button type="submit" id="calculate-difference" class="btn btn-primary btn-block">Calculate
+              Difference</button>
+          </form>
+          <p id="difference-result" class="mt-4 text-muted"></p>
+        </div>
+      </div>
+    </div> <!-- End of Row -->
+
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      let currentPage = 1; // Current page
+      const limit = 2; // Items per page
+
+      // Function to load weight history with pagination
+      function loadWeightHistory(page = 1) {
+        $.ajax({
+          url: '/getWeights',
+          type: 'GET',
+          data: { page, limit },
+          success: function (data) {
+            const weightList = $('#weight-list-items');
+            weightList.empty();
+
+            if (data.weights.length === 0) {
+              weightList.append('<tr><td colspan="3" class="text-center">No weights added yet.</td></tr>');
+            } else {
+              data.weights.forEach(function (weight) {
+                const row = $('<tr>').addClass('text-center');
+                row.append(`<td>${new Date(weight.date).toLocaleDateString()}</td>`);
+                row.append(`<td>${weight.weight} kg</td>`);
+                row.append(`
+                  <td>
+                    <button class="edit-button btn btn-link text-primary" data-id="${weight._id}">Edit</button>
+                    <button class="delete-button btn btn-link text-danger" data-id="${weight._id}">Delete</button>
+                  </td>
+                `);
+                weightList.append(row);
+              });
+            }
+
+            // Update pagination controls
+            currentPage = data.currentPage;
+            $('#current-page').text(`Page ${data.currentPage}`);
+            $('#prev-page').prop('disabled', currentPage === 1);
+            $('#next-page').prop('disabled', currentPage >= data.totalPages);
+          },
+          error: function () {
+            alert('Error loading weight history.');
+          }
+        });
+      }
+
+      // Load weight history on page load
+      loadWeightHistory();
+
+      // Pagination controls
+      $('#prev-page').click(function () {
+        if (currentPage > 1) {
+          loadWeightHistory(currentPage - 1);
+        }
+      });
+
+      $('#next-page').click(function () {
+        loadWeightHistory(currentPage + 1);
+      });
+
+      // Add weight button click
+      $('form').submit(function (event) {
+        event.preventDefault();
+
+        const weight = $('#weight').val();
+
+        $.ajax({
+          url: $(this).attr('action'),
+          type: 'POST',
+          data: { weight: weight },
+          success: function () {
+            $('#weight').val('');
+            $('#add-weight-error').text('');
+            loadWeightHistory(); // Reload weights
+          },
+          error: function (xhr) {
+            if (xhr.status === 400) {
+              alert(xhr.responseJSON.message);
+            } else {
+              $('#add-weight-error').text(xhr.responseJSON.message);
+            }
+          }
+        });
+      });
+
+      // Edit weight
+      $(document).on('click', '.edit-button', function () {
+        const weightId = $(this).data('id');
+        const currentWeight = $(this).closest('tr').find('td:nth-child(2)').text();
+
+        const newWeight = prompt('Enter new weight:', currentWeight);
+
+        if (newWeight !== null) {
+          $.ajax({
+            url: `/editWeight/${weightId}`,
+            type: 'PUT',
+            data: { weight: newWeight },
+            success: function () {
+              loadWeightHistory(currentPage); // Reload current page
+            },
+            error: function () {
+              alert('Error editing weight.');
+            }
+          });
+        }
+      });
+
+      // Delete weight
+      $(document).on('click', '.delete-button', function () {
+        const weightId = $(this).data('id');
+
+        if (confirm('Are you sure you want to delete this weight?')) {
+          $.ajax({
+            url: `/deleteWeight/${weightId}`,
+            type: 'DELETE',
+            success: function () {
+              loadWeightHistory(currentPage); // Reload current page
+            },
+            error: function () {
+              alert('Error deleting weight.');
+            }
+          });
+        }
+      });
+
+      // Calculate weight difference
+      $('#difference-form').submit(function (event) {
+        event.preventDefault();
+
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
+
+        if (!startDate || !endDate) {
+          $('#difference-result').text('Please provide both start and end dates.');
+          return;
+        }
+
+        $.ajax({
+          url: '/weight-difference',
+          type: 'GET',
+          data: { startDate, endDate },
+          success: function (response) {
+            const resultText = `
+              Start Date: ${new Date(response.startDate).toLocaleDateString()}<br>
+              Start Weight: ${response.startWeight} kg<br>
+              End Date: ${new Date(response.endDate).toLocaleDateString()}<br>
+              End Weight: ${response.endWeight} kg<br>
+              Weight Difference: ${response.weightDifference} kg
+            `;
+            $('#difference-result').html(resultText);
+          },
+          error: function () {
+            $('#difference-result').text('Error calculating difference.');
+          }
+        });
+      });
+    });
+
+    $(document).ready(function () {
+      // Handle the logout button click
+      $('#logout-btn').click(function (event) {
+        event.preventDefault();
+
+        $.ajax({
+          url: '/logout', // The route for logging out
+          type: 'POST',
+          success: function () {
+            window.location.href = '/login'; // Redirect to the login page
+          },
+          error: function () {
+            alert('Error logging out. Please try again.');
+          }
+        });
+      });
+    });
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
